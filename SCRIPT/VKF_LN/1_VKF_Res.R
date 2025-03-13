@@ -3,7 +3,7 @@
 # 1. Import libraries ---------------------------------------------------------------
 source("SCRIPT/utl/palette_plot.R")
 
-packages <- c("rstan", "dplyr", "readr", "tidyverse","ggpubr","emmeans",
+packages = c("rstan", "dplyr", "readr", "tidyverse","ggpubr","emmeans",
               "sjPlot", "effectsize", "bayesplot", "bayestestR", "tidybayes",
               "kableExtra", "patchwork")
 sapply(packages, require, character.only = T)
@@ -12,8 +12,8 @@ theme_set(theme_pubclean(base_size = 8))
 
 # 2. Load Models  ---------------------------------------------------------------
 
-FS <- readRDS("MODEL/VKF_LN/fs_complete.rds")
-SD <- readRDS("MODEL/VKF_LN/sd_complete.rds")
+FS = readRDS("MODEL/VKF_LN/fs_complete.rds")
+SD = readRDS("MODEL/VKF_LN/sd_complete.rds")
 
 ## 3 Check model --------------------------------------------------------------------
 # R-Hat
@@ -46,17 +46,17 @@ ggsave("PLOT/p_cor_post_SD.png", plot = p_cor_post_SD, dpi = 300,
 
 # 4. Summary of Model Output ---------------------------------------------------------------------
 
-post_fs <-as.data.frame(FS)
-post_sd <-as.data.frame(SD)
+post_fs =as.data.frame(FS)
+post_sd =as.data.frame(SD)
 
 # Back transform omega exp to real
-post_fs$omega_tran_1 <- exp(post_fs$omega)
-post_sd$omega_tran_1 <- exp(post_sd$omega)
-post_fs$omega_tran_2 <- exp(post_fs$omega + post_fs$beta_om_se)
-post_sd$omega_tran_2 <- exp(post_sd$omega + post_sd$beta_om_se)
+post_fs$omega_tran_1 = exp(post_fs$omega)
+post_sd$omega_tran_1 = exp(post_sd$omega)
+post_fs$omega_tran_2 = exp(post_fs$omega + post_fs$beta_om_se)
+post_sd$omega_tran_2 = exp(post_sd$omega + post_sd$beta_om_se)
 # Back transform lambda prob to real
-post_fs$lam_tran <- pnorm(post_fs$lambda)
-post_sd$lam_tran <- pnorm(post_sd$lambda)
+post_fs$lam_tran = pnorm(post_fs$lambda)
+post_sd$lam_tran = pnorm(post_sd$lambda)
 
 
 # Summary Table FS
@@ -175,7 +175,7 @@ descr = round(HDInterval::hdi(beta_tn_se_cont, ci = .95),2);descr
 
 
 # Plot Omega and Lambda ----------------------------------------------------------------------------
-df_plot <- data.frame(omega =c(post_fs$omega_tran_1,post_fs$omega_tran_2,
+df_plot = data.frame(omega =c(post_fs$omega_tran_1,post_fs$omega_tran_2,
                                post_sd$omega_tran_1,post_sd$omega_tran_2),
                       lambda = c(post_fs$lam_tran,post_fs$lam_tran,
                                  post_sd$lam_tran,post_sd$lam_tran),

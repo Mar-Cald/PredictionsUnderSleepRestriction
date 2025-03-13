@@ -2,25 +2,25 @@
 
 set.seed(15595)
 
-# 0. Import libraries ---------------------
+# 1. Import libraries ---------------------------------------------------------------
 source("SCRIPT/utl/palette_plot.R")
 source("SCRIPT/utl/functions.R")
 
-packages <- c("rstan", "readr", "patchwork", "ggpubr")
+packages = c("rstan", "readr", "patchwork", "ggpubr")
 sapply(packages, require, character.only = T)
 theme_set(theme_pubr(base_size = 24))
 
-# 1.Load data -------------------------------------
+# 2.Load data -------------------------------------
 
-go_nogo <- read_csv("DATA/OUT/go_nogo.csv")
+go_nogo = read_csv("DATA/OUT/go_nogo.csv")
 
-go <- ifelse(go_nogo$target[1:448] == "go.png", 1,0)
+go = ifelse(go_nogo$target[1:448] == "go.png", 1,0)
 
-dat_mod <-list(N = 448, 
+dat_mod =list(N = 448, 
                u = go)
 
-# 2. Fit ----------------------------------------
-file <- "
+# 3. Fit ----------------------------------------
+file = "
 functions {
     // Sigmoid x vkf
   real sigmoid(real x) {
@@ -96,30 +96,30 @@ model {
 }
 "
 
-fit <- stan(
+fit = stan(
   model_code = file,# Stan program
   data = dat_mod, chains = 3, cores = 3,
   iter = 4000)
 
 
-# 3. Extract predictions for RTs and ACC analysis -------------
+# 4. Extract predictions for RTs and ACC analysis -------------
  
-df_fit <- rstan::get_posterior_mean(fit) 
-predictions <- df_fit[14:461,4]
-predictions <- data.frame(predictions = predictions, Trial = 1:448)
+df_fit = rstan::get_posterior_mean(fit) 
+predictions = df_fit[14:461,4]
+predictions = data.frame(predictions = predictions, Trial = 1:448)
 
 # Save!
 write_csv(predictions, "DATA/OUT/ideal_pred_vkf.csv")
 
 
-# 4. Plot ------------------------------------------------------------------------------------------------------------
+# 5. Plot ------------------------------------------------------------------------------------------------------------
 #rm(list = ls())
 
-go_nogo <- read_csv("DATA/OUT/go_nogo.csv")
+go_nogo = read_csv("DATA/OUT/go_nogo.csv")
 
-go <- ifelse(go_nogo$target[1:448] == "go.png", 1,0)
+go = ifelse(go_nogo$target[1:448] == "go.png", 1,0)
 
-dat_mod <-list(N = 448, 
+dat_mod =list(N = 448, 
                u = go)
 
 predictions = read.csv("DATA/OUT/ideal_pred_vkf.csv")
@@ -128,15 +128,15 @@ p_block = data.frame(predictions = c(rep(0.2,40),rep(0.8,40),rep(0.5,32),rep(0.8
                       rep(0.8,40),rep(0.2,40),rep(0.5,32), rep(0.2,40),rep(0.8,40),rep(0.5,32)),
                      Trial = 1:448)
 
-predictions <- data.frame(predictions = sigmoid(predictions$predictions), Trial = predictions$Trial)
+predictions = data.frame(predictions = sigmoid(predictions$predictions), Trial = predictions$Trial)
 
-df_plot <- rbind(p_block,predictions)
+df_plot = rbind(p_block,predictions)
 df_plot$GO = dat_mod$u
 df_plot$NOGO = ifelse(dat_mod$u == 1, 0,1)
 
 df_plot$type = c(rep("block_level",448),rep("trial_level",448))
 
-pal <- c("black", "green4")
+pal = c("black", "green4")
 
 pred = ggplot(df_plot,aes(x =Trial,y = predictions, color = type)) +
   geom_line(linewidth = 1.2, alpha = 0.9, show.legend = FALSE) +

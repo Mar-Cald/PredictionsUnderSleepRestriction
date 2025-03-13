@@ -4,7 +4,7 @@
 # 1. Import libraries ---------------------------------------------------------------
 source("SCRIPT/utl/palette_plot.R")
 
-packages <- c("rstan", "tidyverse","ggpubr","ggplot2",
+packages = c("rstan", "tidyverse","ggpubr","ggplot2",
               "sjPlot",  "patchwork", "overlapping")
 sapply(packages, require, character.only = T)
 
@@ -14,25 +14,25 @@ theme_set(theme_pubr(base_size = 12))
 # 2. Well-Rested  ---------------------------------------------------------------
 
 # Load Model
-FS <- readRDS("MODEL/VKF_LN/fs_complete.rds")
+FS = readRDS("MODEL/VKF_LN/fs_complete.rds")
 
 # Load data
 # FS 
-dat_fs <- readRDS("DATA/OUT/dat_fs.rds")
+dat_fs = readRDS("DATA/OUT/dat_fs.rds")
 
 # Load model for posterior prediction
-gen_model <- stan_model(file = "SCRIPT/VKF_LN/model_file_complete_pp.stan")
+gen_model = stan_model(file = "SCRIPT/VKF_LN/model_file_complete_pp.stan")
 
 # Parameter values from model FS
-draws_par <-  as.matrix(FS)[1:500, , drop = FALSE]
+draws_par =  as.matrix(FS)[1:500, , drop = FALSE]
 
 # Extract model prediction
-gen_data_fs <- gqs(gen_model,
+gen_data_fs = gqs(gen_model,
                    data = dat_fs,
                    draws = draws_par)
 
 
-df_pred_fs <- rstan::extract(gen_data_fs)$predictions %>%
+df_pred_fs = rstan::extract(gen_data_fs)$predictions %>%
   as.data.frame() %>%
   mutate(sim = 1:n()) %>%
   pivot_longer(cols = -sim,
@@ -44,12 +44,12 @@ df_pred_fs <- rstan::extract(gen_data_fs)$predictions %>%
 
 
 # extract real data
-df_main_fs <- as.data.frame(dat_fs) %>%
+df_main_fs = as.data.frame(dat_fs) %>%
   dplyr::select(subj, SE) %>%
   mutate(obs_id = 1:n())
 
 # Join with real data
-df_pred_both <- df_pred_fs %>%
+df_pred_both = df_pred_fs %>%
   left_join(df_main_fs)%>%
   dplyr::bind_rows(df_main_fs)%>%
   mutate(SE = factor(ifelse(SE == 0, "Se1","Se2")),
@@ -63,24 +63,24 @@ df_pred_both <- df_pred_fs %>%
 # 2. Sleep - Restriction  ---------------------------------------------------------------
 
 # Load Model
-SD <- readRDS("MODEL/VKF_LN/sd_complete.rds")
+SD = readRDS("MODEL/VKF_LN/sd_complete.rds")
 
 # Load data
 # SD
-dat_sd <- readRDS("DATA/OUT/dat_sd.rds")
+dat_sd = readRDS("DATA/OUT/dat_sd.rds")
 
 # Load model for posterior prediction
-gen_model <- stan_model(file = "SCRIPT/VKF_LN/model_file_complete_pp.stan")
+gen_model = stan_model(file = "SCRIPT/VKF_LN/model_file_complete_pp.stan")
 
 # Parameter values from model FS
-draws_par <-  as.matrix(SD)[1:500, , drop = FALSE]
+draws_par =  as.matrix(SD)[1:500, , drop = FALSE]
 
 # Extract model prediction
-gen_data_sd <- gqs(gen_model,
+gen_data_sd = gqs(gen_model,
                    data = dat_sd,
                    draws = draws_par)
 
-df_pred_sd <- rstan::extract(gen_data_sd)$predictions %>%
+df_pred_sd = rstan::extract(gen_data_sd)$predictions %>%
   as.data.frame() %>%
   mutate(sim = 1:n()) %>%
   pivot_longer(cols = -sim,
@@ -92,12 +92,12 @@ df_pred_sd <- rstan::extract(gen_data_sd)$predictions %>%
 
 
 # extract real data
-df_main_sd <- as.data.frame(dat_sd) %>%
+df_main_sd = as.data.frame(dat_sd) %>%
   dplyr::select(subj, SE) %>%
   mutate(obs_id = 1:n())
 
 # Join with real data
-df_pred_both_sd <- df_pred_sd %>%
+df_pred_both_sd = df_pred_sd %>%
   left_join(df_main_sd)%>%
   dplyr::bind_rows(df_main_sd)%>%
   mutate(SE = factor(ifelse(SE == 0, "Se1","Se2")),

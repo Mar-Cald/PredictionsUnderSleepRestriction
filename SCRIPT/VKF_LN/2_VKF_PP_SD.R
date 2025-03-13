@@ -4,7 +4,7 @@
 # 1. Import libraries ---------------------------------------------------------------
 source("SCRIPT/utl/palette_plot.R")
 
-packages <- c("rstan", "tidyverse","ggpubr","ggplot2",
+packages = c("rstan", "tidyverse","ggpubr","ggplot2",
               "sjPlot",  "patchwork", "overlapping")
 sapply(packages, require, character.only = T)
 
@@ -14,24 +14,24 @@ theme_set(theme_pubr(base_size = 12))
 # 2. Sleep - Restriction  ---------------------------------------------------------------
 
 # Load Model
-SD <- readRDS("MODEL/VKF_LN/sd_complete.rds")
+SD = readRDS("MODEL/VKF_LN/sd_complete.rds")
 
 # Load data
 # SD
-dat_sd <- readRDS("DATA/OUT/dat_sd.rds")
+dat_sd = readRDS("DATA/OUT/dat_sd.rds")
 
 # Load model for posterior prediction
-gen_model <- stan_model(file = "SCRIPT/VKF_LN/model_file_complete_pp.stan")
+gen_model = stan_model(file = "SCRIPT/VKF_LN/model_file_complete_pp.stan")
 
 # Parameter values from model FS
-draws_par <-  as.matrix(SD)[1:500, , drop = FALSE]
+draws_par =  as.matrix(SD)[1:500, , drop = FALSE]
 
 # Extract model prediction
-gen_data_sd <- gqs(gen_model,
+gen_data_sd = gqs(gen_model,
                    data = dat_sd,
                    draws = draws_par)
 
-df_rt_pred_sd <- rstan::extract(gen_data_sd)$rt_pred %>%
+df_rt_pred_sd = rstan::extract(gen_data_sd)$rt_pred %>%
   as.data.frame() %>%
   mutate(sim = 1:n()) %>%
   pivot_longer(cols = -sim,
@@ -40,7 +40,7 @@ df_rt_pred_sd <- rstan::extract(gen_data_sd)$rt_pred %>%
                values_to = "rt_pred") %>%
   mutate(obs_id = as.numeric(obs_id))
 
-df_pe_pred_sd <- rstan::extract(gen_data_sd)$PGo %>%
+df_pe_pred_sd = rstan::extract(gen_data_sd)$PGo %>%
   as.data.frame() %>%
   mutate(sim = 1:n()) %>%
   pivot_longer(cols = -sim,
@@ -55,14 +55,14 @@ df_pred_sd = df_rt_pred_sd %>%
 sum(df_pred_sd$sim==1)
 
 # extract real data
-df_main_sd <- as.data.frame(dat_sd) %>%
+df_main_sd = as.data.frame(dat_sd) %>%
   dplyr::select(subj, GO, SE, rt) %>%
   subset(rt != 999)%>%
   mutate(obs_id = 1:n())
 
 
 # Join with real data
-df_both_rt_sd <- df_pred_sd %>%
+df_both_rt_sd = df_pred_sd %>%
   left_join(dplyr::select(df_main_sd, -rt)) %>%
   dplyr::rename(rt = rt_pred) %>%
   dplyr::bind_rows(df_main_sd)%>%
@@ -71,12 +71,12 @@ df_both_rt_sd <- df_pred_sd %>%
          SE = ifelse(SE == 0, "Se1","Se2"))%>%
   subset(!is.na(GO))
 
-df_both_rt_sd$Stimulus <- as.factor(ifelse(df_both_rt_sd$GO == 1, "Go","NoGo"))
-df_both_rt_sd$PGo <- as.factor(case_when(df_both_rt_sd$predictions < -.35 ~ "PGo ~20%",
+df_both_rt_sd$Stimulus = as.factor(ifelse(df_both_rt_sd$GO == 1, "Go","NoGo"))
+df_both_rt_sd$PGo = as.factor(case_when(df_both_rt_sd$predictions < -.35 ~ "PGo ~20%",
                                          df_both_rt_sd$predictions > .35 ~ "PGo ~80%" ,
                                          df_both_rt_sd$predictions <= .35 & 
                                            df_both_rt_sd$predictions >= -.35 ~ "20%< PGo >80%"))
-df_both_rt_sd$PGo <- c(na.omit(df_both_rt_sd$PGo), 
+df_both_rt_sd$PGo = c(na.omit(df_both_rt_sd$PGo), 
                        df_both_rt_sd$PGo[df_both_rt_sd$sim == 1])
 table(df_both_rt_sd$PGo) 
 

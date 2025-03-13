@@ -1,36 +1,36 @@
 # Pre-processing Demo and Quest
 
 
-## 0.Load Packages --------------------------------------------------------------
+# 1. Import libraries ---------------------------------------------------------------
 
 source("SCRIPT/utl/palette_plot.R")
 
-packages <- c("readr", "dplyr", "tidyverse", "ggplot2",
+packages = c("readr", "dplyr", "tidyverse", "ggplot2",
               "ggpubr", "patchwork", "lubridate")
 sapply(packages, require, character.only = T)
 
 theme_set(theme_pubr(base_size = 12))
 
-## 1.Load data --------------------------------------------------------------
+## 2.Load data --------------------------------------------------------------
 
-d <- read_csv("DATA/RAW/data_quest/DemoQuest.csv")
-d_group_id <- read_csv("DATA/OUT/group_id.csv")
-dat_PSQI <- read_csv("DATA/RAW/data_quest/PSQI.csv")
-id_2 <- read_csv("DATA/OUT/id_s2.csv")
-id_2$id <- as.factor(id_2$x)
+d = read_csv("DATA/RAW/data_quest/DemoQuest.csv")
+d_group_id = read_csv("DATA/OUT/group_id.csv")
+dat_PSQI = read_csv("DATA/RAW/data_quest/PSQI.csv")
+id_2 = read_csv("DATA/OUT/id_s2.csv")
+id_2$id = as.factor(id_2$x)
 
-dat_all <- d %>%
+dat_all = d %>%
   left_join(dat_PSQI, by = "id")%>%
   mutate(PSQI = PSQI)
 
-dat <- d_group_id %>%
+dat = d_group_id %>%
   left_join(dat_all, by = "id")
 
-## 2. Prep data --------------------------------------------------------------
+## 3. Prep data --------------------------------------------------------------
 
 ## Session 1
 
-dat_clean_1 <- subset(dat,
+dat_clean_1 = subset(dat,
                         # low ACC
                         id != "GNG38" & id != "GNG59" & id != "GNG102" &
                         # PSQI = 14
@@ -51,7 +51,7 @@ dat_clean_1$Current_age = time_length(interval(dmy(dat_clean_1$Age),
 
 
 ## Session 2
-dat_clean_2 <- subset(dat,
+dat_clean_2 = subset(dat,
                         # low ACC
                         id != "GNG38" & id != "GNG59" & id != "GNG102" &
                         # PSQI = 14
@@ -69,36 +69,36 @@ dat_clean_2 <- subset(dat,
                         id != "GNG18" & id != "GNG29" &
                         id != "GNG34" & id != "GNG50")
 
-dat_clean_2 <- subset(dat_clean_2, id%in%id_2$id)
+dat_clean_2 = subset(dat_clean_2, id%in%id_2$id)
 
 # Compute Age
 dat_clean_2$Current_age = time_length(interval(dmy(dat_clean_2$Age), 
                                                ymd(Sys.Date())),"year")
-# 2.1 Descriptive -----------------------------------
+# 3.1 Descriptive -----------------------------------
 
-dat_all <- rbind(dat_clean_1,dat_clean_2)
-dat_all$Session <- c(rep(1,nrow(dat_clean_1)), rep(2,nrow(dat_clean_2)))
+dat_all = rbind(dat_clean_1,dat_clean_2)
+dat_all$Session = c(rep(1,nrow(dat_clean_1)), rep(2,nrow(dat_clean_2)))
 
 # Age
-descriptive_Age <- dat_all %>%
+descriptive_Age = dat_all %>%
   group_by(Order,Session) %>%
   dplyr::summarize(Current_age_mean = round(mean(Current_age,na.rm = TRUE)),
                    Current_age_sd = round(sd(Current_age,na.rm = TRUE)))
 
-descriptive_Gender <- dat_all %>%
+descriptive_Gender = dat_all %>%
   group_by(Order,Session) %>%
   dplyr::summarize(Fem = sum(Gender == "Femmina",na.rm = TRUE),
                    Mal = sum(Gender == "Maschio",na.rm = TRUE),
                    Non = sum(Gender == "Non mi identifico con nessuno dei precedenti", na.rm = TRUE))
 
-Desc <- descriptive_Age %>%
+Desc = descriptive_Age %>%
   left_join(descriptive_Gender, by = c("Order","Session"))
 
 colnames(Desc) = c('Group','Session','Mean Age','Sd Age', 'Females', 'Males' ,'Non-Binary')
 
 
 # Data
-data <- data.frame(
+data = data.frame(
   Group = c("SR", "SR", "WR", "WR"),
   Session = c(1, 2, 1, 2),
   Age = c("25 (3)", "25 (3)", "24 (2)", "24 (2)"),
@@ -108,7 +108,7 @@ data <- data.frame(
 )
 
 # Create the table
-table <- data %>%
+table = data %>%
   kable("html") %>%
   kable_styling(full_width = FALSE)
 
@@ -122,7 +122,7 @@ write.csv(Desc, file = "DATA/OUT/Desc.csv")
 # Save Data  Questionnaires----
 write_csv(dat_all, file = "DATA/OUT/Quest.csv")
 
-Descriptive_Quest <- dat_all %>%
+Descriptive_Quest = dat_all %>%
   group_by(Order) %>%
   dplyr::summarize(Depression_m = round(mean(D,na.rm = TRUE)),
                    Depression_sd = round(sd(D,na.rm = TRUE)),

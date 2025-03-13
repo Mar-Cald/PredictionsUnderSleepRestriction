@@ -1,11 +1,11 @@
 # Pre-processing Sleepiness and Stress ratings
 
 
-## 0.Load Packages --------------------------------------------------------------
+# 1. Import libraries ---------------------------------------------------------------
 
 source("SCRIPT/utl/palette_plot.R")
 
-packages <- c("readr", "dplyr", "tidyverse", "ggplot2",
+packages = c("readr", "dplyr", "tidyverse", "ggplot2",
               "ggpubr", "patchwork")
 
 sapply(packages, require, character.only = T)
@@ -13,17 +13,17 @@ sapply(packages, require, character.only = T)
 
 theme_set(theme_pubr(base_size = 12))
 
-## 1.Load data --------------------------------------------------------------
+## 2. Load data --------------------------------------------------------------
 
-d <- list.files(path = "DATA/RAW/data_exp", pattern = "*.csv", full.names = TRUE) %>%
+d = list.files(path = "DATA/RAW/data_exp", pattern = "*.csv", full.names = TRUE) %>%
   map_df(~read_csv(.x) %>% mutate(condition = as.character(condition),
                                   session = as.character(session))) # Combine data sets into one data set 
 
 
-## 2. Prep data --------------------------------------------------------------
+## 3. Prep data --------------------------------------------------------------
 
 #select columns of interest and adjust names
-dat <- d |>
+dat = d |>
   select(participant, condition, session, sleep_kb.keys, stress_slide.response)|>
   mutate(id = case_when(participant == "GNG87"~ "GNG84",
                         participant == "GN103"~ "GNG103",
@@ -68,7 +68,7 @@ dat = dat %>%
 # Exclude participants data --------------------------------------------
 
 ## Session 1
-dat_clean_1 <- subset(dat, S == 1 &
+dat_clean_1 = subset(dat, S == 1 &
                      # low ACC
                      id != "GNG38" & id != "GNG59" & id != "GNG102" &
                        #PSQI = 14 
@@ -84,7 +84,7 @@ dat_clean_1 <- subset(dat, S == 1 &
                      id != "GNG96" & id != "GNG105")
 
 ## Session 2
-dat_clean_2 <- subset(dat, S == 2 &
+dat_clean_2 = subset(dat, S == 2 &
                         # low ACC
                         id != "GNG38" & id != "GNG59" & id != "GNG102" &
                         #PSQI = 14 
@@ -102,7 +102,7 @@ dat_clean_2 <- subset(dat, S == 2 &
                         id != "GNG18" & id != "GNG29" &
                         id != "GNG34" & id != "GNG50")
 
-dat_clean <- rbind(dat_clean_1,dat_clean_2)
+dat_clean = rbind(dat_clean_1,dat_clean_2)
 
 # save!
 write_csv(dat_clean, file = "DATA/OUT/SleepStress.csv")

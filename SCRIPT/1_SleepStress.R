@@ -5,7 +5,7 @@ set.seed(15595)
 # 1. Import libraries ---------------------------------------------------------------
 source("SCRIPT/utl/palette_plot.R")
 
-packages <- c("rstan", "dplyr", "readr", "brms", "tidyverse", "ggpubr",
+packages = c("rstan", "dplyr", "readr", "brms", "tidyverse", "ggpubr",
               "sjPlot", "effectsize", "bayesplot", "bayestestR",
               "patchwork")
 sapply(packages, require, character.only = T)
@@ -15,7 +15,7 @@ theme_set(theme_pubr(base_size = 12))
 
 # 2. Load data  ---------------------------------------------------------------
 
-dat <- read_csv("DATA/OUT/SleepStress.csv")|>
+dat = read_csv("DATA/OUT/SleepStress.csv")|>
   mutate(Group = ifelse(as.factor(Order) == "WR_WR","WR","SR"),
          Sleep = sleep_kb.keys,
          Stress = stress_slide.response,
@@ -27,17 +27,17 @@ hist(dat$Stress)
 
 # 2.1 Fit Sleep model ---------------------------------------------------------------------------------
 
-formula <- bf(Sleep ~ 0 +  Group:Session,
+formula = bf(Sleep ~ 0 +  Group:Session,
               family = poisson(link = identity))
 
 # look at default priors
 get_prior(formula = formula, data = dat)
 
-priors <- c(
+priors = c(
   set_prior("gamma(0.5, 0.5)", class = "b", lb = 1,ub = 10))
 
 
-mod_sleep <- brm(formula = formula,
+mod_sleep = brm(formula = formula,
                  prior = priors,
                 data = dat, 
                 sample_prior = "yes", chains = 4,
@@ -91,17 +91,17 @@ p_sleep
 
 # 3.1 Fit Stress model ---------------------------------------------------------------------------------
 
-formula <- bf(Stress ~ 0 + Group:Session,
+formula = bf(Stress ~ 0 + Group:Session,
               family = gaussian())
 
 # look at default priors
 get_prior(formula = formula, data = dat)
 
-priors <- c(
+priors = c(
   set_prior("student_t(2, 5, 2)", class = "b", lb = 1, ub = 10))
 
 
-mod_stress <- brm(formula = formula,
+mod_stress = brm(formula = formula,
                  data = dat, 
                  prior = priors,
                  sample_prior = "yes", 

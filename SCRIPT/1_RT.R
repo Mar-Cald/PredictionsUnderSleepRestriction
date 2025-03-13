@@ -5,7 +5,7 @@ set.seed(15595)
 # 1. Import libraries ---------------------------------------------------------------
 source("SCRIPT/utl/palette_plot.R")
 
-packages <- c("rstan", "dplyr", "readr", "brms", "tidyverse","ggpubr","emmeans",
+packages = c("rstan", "dplyr", "readr", "brms", "tidyverse","ggpubr","emmeans",
               "sjPlot", "effectsize", "bayesplot", "bayestestR", "tidybayes",
               "HDInterval", "ggplot2")
 
@@ -15,11 +15,11 @@ theme_set(theme_pubclean(base_size = 14))
 
 # 2. Load data  ---------------------------------------------------------------
 
-go_nogo <- read_csv("DATA/OUT/go_nogo.csv")
-ideal_pred <- read_csv("DATA/OUT/ideal_pred_vkf.csv")
+go_nogo = read_csv("DATA/OUT/go_nogo.csv")
+ideal_pred = read_csv("DATA/OUT/ideal_pred_vkf.csv")
 
 ## Session 1
-dat_clean_1 <- subset(go_nogo, S == 1 &
+dat_clean_1 = subset(go_nogo, S == 1 &
                         # low ACC
                         id != "GNG38" & id != "GNG59" & id != "GNG102" &
                         # PSQI = 14
@@ -35,7 +35,7 @@ dat_clean_1 <- subset(go_nogo, S == 1 &
                         id != "GNG96" & id != "GNG105")
 
 ## Session 2
-dat_clean_2 <- subset(go_nogo, S == 2 &
+dat_clean_2 = subset(go_nogo, S == 2 &
                         # low ACC
                         id != "GNG38" & id != "GNG59" & id != "GNG102" &
                         # PSQI = 14
@@ -53,18 +53,18 @@ dat_clean_2 <- subset(go_nogo, S == 2 &
                         id != "GNG18" & id != "GNG29" &
                         id != "GNG34" & id != "GNG50")
 
-df_clean <- rbind(dat_clean_1,dat_clean_2)
+df_clean = rbind(dat_clean_1,dat_clean_2)
 # Extract id s2 completed
-id_s2 <- unique(dat_clean_2$id)
+id_s2 = unique(dat_clean_2$id)
 write.csv(id_s2, "DATA/OUT/id_s2.csv")
 str(df_clean)
 
-df_ideal <- df_clean |>
+df_ideal = df_clean |>
   left_join(ideal_pred, by = "Trial")
 
 
 # Clean -------------------------
-df_go <- subset(df_ideal,   rt >.1 )|>
+df_go = subset(df_ideal,   rt >.1 )|>
   dplyr::select(rt,id, P, Order, S, Trial, predictions,target)|>
   dplyr::mutate(id = as.factor(id),
                 C = as.factor(Order),
@@ -82,22 +82,22 @@ min(df_go$PG);max(df_go$PG); #check
 min(df_go$TN);max(df_go$TN); #check 
 min(df_go$rt);max(df_go$rt); #check 
 #contrast for modeling
-contrasts(df_go$C) <- contr.sum(2)/2;contrasts(df_go$C) 
-contrasts(df_go$TAR) <- contr.sum(2)/2;contrasts(df_go$TAR) 
+contrasts(df_go$C) = contr.sum(2)/2;contrasts(df_go$C) 
+contrasts(df_go$TAR) = contr.sum(2)/2;contrasts(df_go$TAR) 
 
 str(df_go$id)
 contrasts(df_go$S)
 
 
 # 3. Fit ---------------------------------------------------------------------------------
-formula <- bf(rt ~ 1 +  C * PG  * TN * S + TAR + (1 + PG  * TN * S + TAR |gr(id, by = C)),
+formula = bf(rt ~ 1 +  C * PG  * TN * S + TAR + (1 + PG  * TN * S + TAR |gr(id, by = C)),
               family = lognormal())
 # 
 get_prior(formula = formula, data = df_go)
 # 
 
 # Set weakly informative priors 
-priors <- c(#ndt
+priors = c(#ndt
   #mu
   set_prior("student_t(2, -.9, 1)", class = "Intercept", lb = -3, ub = -.3),
   set_prior("normal(0, .1)", class = "b"),
@@ -110,7 +110,7 @@ priors <- c(#ndt
 
 # Run model  -------------------------------------------------
 
-mod_rt <- brm(formula = formula,
+mod_rt = brm(formula = formula,
               data = df_go, 
               prior = priors,
               sample_prior = "yes", chains = 4,
@@ -170,7 +170,7 @@ tab_summary %>%
 ## 4.1. Visualization Interaction ---------------------------------------------------------------------------------
 
 # mu
-p_mu <- sjPlot::plot_model(mod_rt, type = "pred", terms = c("TN [-.5,0,.5]","PG[-.5,0,.5]", 
+p_mu = sjPlot::plot_model(mod_rt, type = "pred", terms = c("TN [-.5,0,.5]","PG[-.5,0,.5]", 
                                                             "S","C"),
                            ci.lvl = .95, line.size = 1.5,
                            auto.label = FALSE, show.legend = F)+
@@ -180,16 +180,16 @@ p_mu <- sjPlot::plot_model(mod_rt, type = "pred", terms = c("TN [-.5,0,.5]","PG[
   ggtitle(label = "")
 
 # Relabel facets for clarity
-p_mu$data$panel <- factor(p_mu$data$panel, labels = c("Well-Rested","Sleep-Restricted"))
-p_mu$data$facet <- factor(p_mu$data$facet, labels = c("Session 1","Session 2"))
+p_mu$data$panel = factor(p_mu$data$panel, labels = c("Well-Rested","Sleep-Restricted"))
+p_mu$data$facet = factor(p_mu$data$facet, labels = c("Session 1","Session 2"))
 p_mu$data$group_col = interaction(p_mu$data$group_col, p_mu$data$panel)
 
 # Define separate color palettes for each condition
-well_rested_colors <- c("#71BDFF", "#3DA4FF", "#12385A") 
-sleep_restricted_colors <- c("#FFBF71", "#FF9807", "#9A5F16")  
+well_rested_colors = c("#71BDFF", "#3DA4FF", "#12385A") 
+sleep_restricted_colors = c("#FFBF71", "#FF9807", "#9A5F16")  
 
 # Assign colors based on "panel"
-p_mu <- p_mu + 
+p_mu = p_mu + 
   scale_fill_manual(name = "PGo", 
                     values = rep(c(well_rested_colors, sleep_restricted_colors), each = 1),
                     labels = c("20%", "50%", "80%", "20%", "50%", "80%")) +

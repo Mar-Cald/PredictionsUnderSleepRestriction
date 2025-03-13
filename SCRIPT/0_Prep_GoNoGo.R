@@ -1,16 +1,16 @@
 # Pre-processing Go-NoGo 
 
 
-## 1.Load Packages --------------------------------------------------------------
+# 1. Import libraries ---------------------------------------------------------------
 
-packages <- c("readr", "dplyr", "tidyverse", "ggplot2", "ggpubr")
+packages = c("readr", "dplyr", "tidyverse", "ggplot2", "ggpubr")
 sapply(packages, require, character.only = T)
 
 theme_set(theme_pubr())
 
 ## 2.Load data --------------------------------------------------------------
 
-d <- list.files(path = "DATA/RAW/data_exp", pattern = "*.csv", full.names = TRUE) %>% 
+d = list.files(path = "DATA/RAW/data_exp", pattern = "*.csv", full.names = TRUE) %>% 
   map_df(~read_csv(.x) %>% mutate(condition = as.character(condition),
                                   session = as.character(session))) # Combine data sets into one data set 
 
@@ -18,7 +18,7 @@ d <- list.files(path = "DATA/RAW/data_exp", pattern = "*.csv", full.names = TRUE
 ## 3. Prep data --------------------------------------------------------------
 
 # DATA GNG task
-dat <- subset(d, RUN >= 1) |>
+dat = subset(d, RUN >= 1) |>
         mutate(id = case_when(participant == "GNG87"~ "GNG84",
                         participant == "GN103"~ "GNG103",
                         participant == "GN100"~ "GNG100",
@@ -77,8 +77,8 @@ sum(subj_group$Order == "SD_FS", na.rm = T) # 43 tot
 
 # Calculate accuracy -----------------------------------------------
 
-dat$acc <- c()
-dat$acc<- case_when(dat$target == "nogo.png" & dat$resp == "space" ~ 0,
+dat$acc = c()
+dat$acc= case_when(dat$target == "nogo.png" & dat$resp == "space" ~ 0,
                     dat$target == "nogo.png" &  is.na(dat$resp) ~ 1,
                     dat$target == "go.png" & dat$resp == "space" ~ 1,
                     dat$target == "go.png" & is.na(dat$resp) ~ 0)
@@ -93,7 +93,7 @@ write_csv(dat, file = 'DATA/OUT/go_nogo.csv')
 # Create dataset for VKF + LN -----------------------------------------------
 go_nogo = dat
 ## Session 1
-dat_clean_1 <- subset(go_nogo, S == 1 &
+dat_clean_1 = subset(go_nogo, S == 1 &
                         # low ACC
                         id != "GNG38" & id != "GNG59" & id != "GNG102" &
                         # PSQI = 14
@@ -109,7 +109,7 @@ dat_clean_1 <- subset(go_nogo, S == 1 &
                         id != "GNG96" & id != "GNG105")
 
 ## Session 2
-dat_clean_2 <- subset(go_nogo, S == 2 &
+dat_clean_2 = subset(go_nogo, S == 2 &
                         # low ACC
                         id != "GNG38" & id != "GNG59" & id != "GNG102" &
                         # PSQI = 14
@@ -127,7 +127,7 @@ dat_clean_2 <- subset(go_nogo, S == 2 &
                         id != "GNG18" & id != "GNG29" &
                         id != "GNG34" & id != "GNG50")
 
-df_clean <- rbind(dat_clean_1,dat_clean_2)
+df_clean = rbind(dat_clean_1,dat_clean_2)
 
 # Well-Rested -----------------------------------------------------------
 dat_WR = subset(df_clean, Order == "FS_FS")|>
@@ -152,7 +152,7 @@ dat_fs = list(rt = dat_WR$rt,
               N_re = 10,
               N_trial = 448)
 
-rt <- subset(dat_fs$rt, dat_fs$rt != 999)
+rt = subset(dat_fs$rt, dat_fs$rt != 999)
 dat_fs$N_rt = length(rt)
 
 saveRDS(dat_fs,"DATA/OUT/dat_fs.rds")
@@ -181,7 +181,7 @@ dat_sd = list(rt = dat_SR$rt,
               N_re = 10,
               N_trial = 448)
 
-rt <- subset(dat_sd$rt, dat_sd$rt != 999)
+rt = subset(dat_sd$rt, dat_sd$rt != 999)
 dat_sd$N_rt = length(rt)
 
 saveRDS(dat_sd,"DATA/OUT/dat_sd.rds")

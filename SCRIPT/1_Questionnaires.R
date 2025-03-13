@@ -5,7 +5,7 @@ set.seed(15595)
 # 1. Import libraries ---------------------------------------------------------------
 source("SCRIPT/utl/palette_plot.R")
 
-packages <- c("rstan", "dplyr", "readr", "brms", "tidyverse", "ggpubr",
+packages = c("rstan", "dplyr", "readr", "brms", "tidyverse", "ggpubr",
               "sjPlot", "effectsize", "bayesplot", "bayestestR",
               "patchwork", "kableExtra")
 sapply(packages, require, character.only = T)
@@ -14,24 +14,24 @@ theme_set(theme_pubr(base_size = 12))
 
 # 2. Load data  ---------------------------------------------------------------
 
-dat_all <- read_csv("DATA/OUT/Quest.csv") %>%
+dat_all = read_csv("DATA/OUT/Quest.csv") %>%
   mutate(Group = ifelse(as.factor(Order) == "WR_WR","WR","SR")) %>%
   select(-Session)
 
-dat_all$Group <- as.factor(dat_all$Group)
-contrasts(dat_all$Group) <- contr.sum(2)/2
+dat_all$Group = as.factor(dat_all$Group)
+contrasts(dat_all$Group) = contr.sum(2)/2
 
-dat_all <- unique(dat_all)
+dat_all = unique(dat_all)
 
 # 2.1 Fit Model ---------------------------------------------------------------------------------
 
-formula <- bf(mvbind(S, A, D, MEQ, Drive, Fun, Reward, Punish, BIS, PSQI)
+formula = bf(mvbind(S, A, D, MEQ, Drive, Fun, Reward, Punish, BIS, PSQI)
               ~ Group, set_rescor(TRUE), family = gaussian())
 
 # look at default priors
 get_prior(formula = formula, data = dat_all)
 
-priors <- c(  
+priors = c(  
   set_prior("student_t(2, 17, 2)", class = "Intercept", resp = "S",
             lb = 0, ub = 38),
   set_prior("student_t(2, 0, 2)", class = "b", resp = "S",
@@ -80,7 +80,7 @@ priors <- c(
   set_prior("lkj(2)", class = "rescor"))
 
 
-mod <- brm(formula = formula,
+mod = brm(formula = formula,
                  prior = priors,
                  data = dat_all, 
                  sample_prior = "yes", chains = 4,
@@ -162,8 +162,8 @@ p_direction(mod)
 
 #----residual correlations ------
 library(kableExtra)
-corri <- summary(mod)$rescor_pars
-corr <- corri[,c(1,3:4)]
+corri = summary(mod)$rescor_pars
+corr = corri[,c(1,3:4)]
 kable(corr, format = "html") %>%
   kable_styling(bootstrap_options = c("striped", "hover",
                                       "condensed", "responsive"))
