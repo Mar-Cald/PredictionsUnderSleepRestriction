@@ -191,12 +191,16 @@ p_omega_1 = ggplot(subset(df_plot, Session == "Session 1"), aes(x = omega, fill 
   geom_density(alpha = .8, lwd = .8, adjust = 1.5)+ 
   scale_fill_manual(values = pal_okabe_ito_2[c(2,1)])+
   scale_x_continuous(breaks = seq(0,2, 0.2),
-                     limits = c(0,2)) + ggtitle("Session 1")
+                     limits = c(0,2)) + ggtitle("Session 1")+
+  scale_y_continuous(breaks = seq(0,4, 0.5),
+                     limits = c(0,4))
 p_omega_2 = ggplot(subset(df_plot, Session == "Session 2"), aes(x = omega, fill = Group))+
   geom_density(alpha = .8, lwd = .8, adjust = 1.5)+ 
   scale_fill_manual(values = pal_okabe_ito_2[c(2,1)])+
   scale_x_continuous(breaks = seq(0,2, 0.2),
-                     limits = c(0,2)) + ggtitle("Session 2")
+                     limits = c(0,2)) + ggtitle("Session 2")+
+  scale_y_continuous(breaks = seq(0,4, 0.5),
+                     limits = c(0,4))
 
 p_omega_1|p_omega_2
 

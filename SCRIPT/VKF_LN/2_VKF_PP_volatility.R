@@ -171,3 +171,5 @@ ggsave("PLOT/vol_traj_sim.jpg",
        plot = p_vol_ok, dpi = 400, 
        width = 10, height = 7)
 
+
+

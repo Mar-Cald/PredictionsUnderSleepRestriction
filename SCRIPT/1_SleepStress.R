@@ -83,8 +83,6 @@ p_sleep = sjPlot::plot_model(mod_sleep, type = "pred", terms = c("Session","Grou
                    axis.title = c("Session","sleepiness ratings"),
                    pred.labels = c("1","2")) +
   scale_x_continuous(breaks = c(0,1), labels=c("1","2"))+
-  geom_line(linewidth = 1.5, 
-            position = position_dodge(width = 0.1))+
   ggtitle(label ="")
 
 p_sleep
@@ -149,8 +147,6 @@ p_stress = sjPlot::plot_model(mod_stress, type = "pred", terms = c("Session","Gr
                              axis.title = c("Session","stress ratings"),
                              pred.labels = c("1","2")) +
   scale_x_continuous(breaks = c(0,1), labels=c("1","2"))+
-  geom_line(linewidth = 1.5, 
-            position = position_dodge(width = 0.1))+
   ggtitle(label ="")
 
 
