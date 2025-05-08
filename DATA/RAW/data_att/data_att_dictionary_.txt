@@ -1,0 +1,11 @@
+id: participant's identifier (character)
+Session: session number, Session_1 vs. Session_2 (character)
+Group: participant's group FS=full sleep vs. SD=sleep restriction (character)
+Ora inizio: start
+Ora fine: end
+Durata: recording time in minutes (integer)
+TIB_h: time in bed hours (double)
+TST_h: total sleep time hours (double)
+SE: sleep efficiency max 100 (double)
+excluded: whether participant did not respect sleep schedule
+
