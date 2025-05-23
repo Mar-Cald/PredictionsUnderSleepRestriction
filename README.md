@@ -1,5 +1,5 @@
 # PredictionsUnderSleepRestriction
-Data and scripts for the paper *Predictions Under Sleep Restriction*. To access the files, go to **Files** and select **GitHub**. 
+Data and scripts for the paper *Predictions Under Sleep Restriction*.  
 Download the folder and open *PredictionUnderSleepRestriction.Rproj* file.
 Preprint:https://osf.io/preprints/psyarxiv/x7m4z_v2
 
