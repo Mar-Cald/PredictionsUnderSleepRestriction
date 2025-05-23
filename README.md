@@ -9,3 +9,4 @@ Surprisingly, we found no group differences in inhibitory control.
 A computational model revealed SR participants had diminished 
 perception of environmental volatility, suggesting challenges 
 in detecting task changes and updating beliefs. 
+Preprint:https://osf.io/preprints/psyarxiv/x7m4z_v2
