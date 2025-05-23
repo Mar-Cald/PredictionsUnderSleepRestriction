@@ -16,7 +16,7 @@ theme_set(theme_pubr(base_size = 12))
 # 2. Load data  ---------------------------------------------------------------
 
 dat = read_csv("DATA/OUT/SleepStress.csv")|>
-  mutate(Group = ifelse(as.factor(Order) == "WR_WR","WR","SR"),
+  mutate(Group = factor(ifelse(as.factor(Order) == "WR_WR","WR","SR")),
          Sleep = sleep_kb.keys,
          Stress = stress_slide.response,
          Session = as.factor(ifelse(session == 1, 0,1)))|>
@@ -26,15 +26,17 @@ hist(dat$Sleep)
 hist(dat$Stress)
 
 # 2.1 Fit Sleep model ---------------------------------------------------------------------------------
+contrasts(dat$Group) = contr.sum(2)/2
+contrasts(dat$Session)
 
-formula = bf(Sleep ~ 0 +  Group:Session,
-              family = poisson(link = identity))
+formula = bf(Sleep ~ 1+  Group*Session,
+              family = cumulative(link = probit))
 
 # look at default priors
 get_prior(formula = formula, data = dat)
 
 priors = c(
-  set_prior("gamma(0.5, 0.5)", class = "b", lb = 1,ub = 10))
+  set_prior("normal(0, 1)", class = "b"))
 
 
 mod_sleep = brm(formula = formula,
@@ -67,37 +69,49 @@ brms::pp_check(mod_sleep, ndraws = 100, type = "dens_overlay_grouped",
 # 2.3 Results ---------------------------------------------------------------------------
 
 summary(mod_sleep, prob = .95)
+post = data.frame(mod_sleep)
+round(HDInterval::hdi(post),2)
 p_direction(mod_sleep)
 
 # test HP
-hypothesis(mod_sleep, "GroupSR:Session0 = GroupWR:Session0")
-hypothesis(mod_sleep, "GroupSR:Session0 - GroupWR:Session0 > 0")
-hypothesis(mod_sleep, "GroupSR:Session1 = GroupWR:Session1")
-hypothesis(mod_sleep, "GroupSR:Session1 - GroupWR:Session1 > 0")
+hypothesis(mod_sleep, "Group1 = 0")
+hypothesis(mod_sleep, "Session1 = 0")
+hypothesis(mod_sleep, "Group1:Session1 = 0")
 
-# visualize
-p_sleep = sjPlot::plot_model(mod_sleep, type = "pred", terms = c("Session","Group"),
-                   ci.lvl = .95, line.size = 1,dot.alpha = 0.2,
-                   dot.size = 3,color = pal_okabe_ito_2[c(2,1)], 
-                   show.data = T, jitter = .2,auto.label = FALSE,
-                   axis.title = c("Session","sleepiness ratings"),
-                   pred.labels = c("1","2")) +
-  scale_x_continuous(breaks = c(0,1), labels=c("1","2"))+
-  ggtitle(label ="")
+conditions = make_conditions(mod_sleep, "Session")
+conditions$cond__ = c("Session 1","Session 2")
+sleep_p = conditional_effects(mod_sleep, categorical = TRUE, 
+                    conditions = conditions)
 
+# define count
+cou=c("1", "2", "3", "4", "5", "6", "7","8")
+
+# define 7 colours from black to red
+colours = brewer.pal(n = 8, name = "Spectral")
+# create values for scale colour manual
+values=setNames(rev(colours), cou)
+
+p_sleep = plot(sleep_p, plot = FALSE)[[1]]+
+  scale_color_manual(values=values) +
+  scale_fill_manual(values=values) +
+  theme_pubr(base_size = 12)
+p_sleep$labels$fill = "Sleepiness"
+p_sleep$labels$colour = "Sleepiness"
 p_sleep
+ggsave("PLOT/Sleep.png", plot = p_sleep, dpi = 300, 
+       width = 8, height = 4)
 
 # 3.1 Fit Stress model ---------------------------------------------------------------------------------
 
-formula = bf(Stress ~ 0 + Group:Session,
+formula = bf(Stress ~ 1 + Group*Session,
               family = gaussian())
 
 # look at default priors
 get_prior(formula = formula, data = dat)
 
-priors = c(
-  set_prior("student_t(2, 5, 2)", class = "b", lb = 1, ub = 10))
-
+priors = c(set_prior("normal(5, 2)", class = "Intercept", 
+                     lb = 1, ub = 10),
+  set_prior("normal(0, 1.5)", class = "b"))
 
 mod_stress = brm(formula = formula,
                  data = dat, 
@@ -130,14 +144,16 @@ brms::pp_check(mod_stress, ndraws = 100, type = "dens_overlay_grouped",
 
 # 3.3 Results ---------------------------------------------------------------------------
 
-summary(mod_stress,prob = .9)
+summary(mod_stress,prob = .95)
+p_direction(mod_stress)
+post = data.frame(mod_stress)
+round(HDInterval::hdi(post),2)
 
 # test HP
-hypothesis(mod_stress, "GroupSR:Session0 = GroupWR:Session0")
-hypothesis(mod_stress, "GroupSR:Session0 - GroupWR:Session0 > 0")
+hypothesis(mod_stress, "Group1 = 0")
+hypothesis(mod_stress, "Session1 = 0")
+hypothesis(mod_stress, "Group1:Session1 = 0")
 
-hypothesis(mod_stress, "GroupSR:Session1 = GroupWR:Session1")
-hypothesis(mod_stress, "GroupSR:Session1 - GroupWR:Session1 > 0")
 
 # visualize
 p_stress = sjPlot::plot_model(mod_stress, type = "pred", terms = c("Session","Group"),
@@ -150,9 +166,4 @@ p_stress = sjPlot::plot_model(mod_stress, type = "pred", terms = c("Session","Gr
   ggtitle(label ="")
 
 
-
-# Export plot
-p = p_sleep|p_stress
-p
-ggsave("PLOT/SleepStress.png", plot = p, dpi = 300, 
-       width = 8, height = 4)
+p_stress
