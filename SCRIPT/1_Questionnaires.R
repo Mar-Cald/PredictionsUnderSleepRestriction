@@ -141,6 +141,8 @@ brms::pp_check(mod, ndraws = 100, type = "dens_overlay_grouped",
 # 2.3 Results ---------------------------------------------------------------------------
 
 summary(mod, prob = .95)
+post = data.frame(mod)
+round(HDInterval::hdi(post),2)
 
 # test HP
 hypothesis(mod, "S_Group1 = 0")

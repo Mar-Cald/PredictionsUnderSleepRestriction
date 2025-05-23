@@ -69,6 +69,8 @@ brms::pp_check(mod_sleep, ndraws = 100, type = "dens_overlay_grouped",
 # 2.3 Results ---------------------------------------------------------------------------
 
 summary(mod_sleep, prob = .95)
+post = data.frame(mod_sleep)
+round(HDInterval::hdi(post),2)
 p_direction(mod_sleep)
 
 # test HP
@@ -144,6 +146,9 @@ brms::pp_check(mod_stress, ndraws = 100, type = "dens_overlay_grouped",
 
 summary(mod_stress,prob = .95)
 p_direction(mod_stress)
+post = data.frame(mod_stress)
+round(HDInterval::hdi(post),2)
+
 # test HP
 hypothesis(mod_stress, "Group1 = 0")
 hypothesis(mod_stress, "Session1 = 0")
